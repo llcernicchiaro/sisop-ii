@@ -14,15 +14,16 @@ int main(int argc, char *argv[])
   int sockfd, n;
   struct sockaddr_in serv_addr;
   struct hostent *server;
+  char username[40];
 
   char buffer[256];
-  if (argc < 2)
+  if (argc < 4)
   {
-    fprintf(stderr, "usage %s hostname\n", argv[0]);
+    fprintf(stderr, "usage %s profile hostname port\n", argv[0]);
     exit(0);
   }
 
-  server = gethostbyname(argv[1]);
+  server = gethostbyname(argv[2]);
   if (server == NULL)
   {
     fprintf(stderr, "ERROR, no such host\n");
@@ -40,9 +41,29 @@ int main(int argc, char *argv[])
   if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     printf("ERROR connecting\n");
 
-  printf("Enter the message: ");
+  printf("Usage (FOLLOW @user | SEND message to send): ");
   bzero(buffer, 256);
   fgets(buffer, 256, stdin);
+
+  char str2[256];
+  strcpy(str2, buffer);
+
+  char *command = strtok(str2, " ");
+  printf("%s\n", buffer);
+
+  if (strcmp(command, "FOLLOW") == 0)
+  {
+    printf("You want to follow: %s\n", buffer);
+  }
+  else if (strcmp(command, "SEND") == 0)
+  {
+    printf("You want to send the message: %s\n", buffer);
+  }
+  else
+  {
+    printf("Invalid command, please try again\n");
+    return 0;
+  }
 
   /* write in the socket */
   n = write(sockfd, buffer, strlen(buffer));
